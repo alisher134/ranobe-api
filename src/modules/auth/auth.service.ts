@@ -7,10 +7,11 @@ import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { AuthRepository } from './auth.repository';
 import { User } from '@prisma/client';
-import { AuthResponse } from './auth.types';
+import { AuthResponse, AuthTokenPayload } from './auth.types';
 import { PasswordService } from './services/password.service';
 import { TokenService } from './services/token.service';
 import { UserMapperService } from './services/user-mapper.service';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +39,19 @@ export class AuthService {
     });
 
     return this.buildResponse(newUser);
+  }
+
+  async refreshToken(dto: RefreshTokenDto): Promise<AuthResponse> {
+    const payload = await this.tokenService.verify<AuthTokenPayload>(
+      dto.refreshToken,
+    );
+
+    const user = await this.authRepository.findByIdentity(payload.sub);
+    if (!user) {
+      throw new UnauthorizedException('Invalid token');
+    }
+
+    return this.buildResponse(user);
   }
 
   private async ensureUserDoesNotExist(email: string) {

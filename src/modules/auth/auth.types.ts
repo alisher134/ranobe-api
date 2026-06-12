@@ -10,3 +10,8 @@ export type AuthTokens = {
 export interface AuthResponse extends AuthTokens {
   user: AuthUser;
 }
+
+export type AuthTokenPayload = {
+  sub: string;
+  email: string;
+};

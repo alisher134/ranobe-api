@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { AuthTokens } from '../auth.types';
+import { AuthTokenPayload, AuthTokens } from '../auth.types';
 import authConfig from 'src/config/auth.config';
 import type { ConfigType } from '@nestjs/config';
 
@@ -14,7 +14,7 @@ export class TokenService {
   ) {}
 
   async generate(user: User): Promise<AuthTokens> {
-    const payload = {
+    const payload: AuthTokenPayload = {
       sub: user.id,
       email: user.email,
     };
@@ -38,5 +38,13 @@ export class TokenService {
       accessToken,
       refreshToken,
     };
+  }
+
+  async verify<T extends object>(token: string): Promise<T> {
+    try {
+      return await this.jwtService.verifyAsync<T>(token);
+    } catch {
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }
