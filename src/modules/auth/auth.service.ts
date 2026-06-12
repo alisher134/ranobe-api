@@ -56,8 +56,8 @@ export class AuthService {
     }
 
     const isPasswordValid = await this.passwordService.verify(
-      dto.password,
       user.hashedPassword,
+      dto.password,
     );
 
     if (!isPasswordValid) {

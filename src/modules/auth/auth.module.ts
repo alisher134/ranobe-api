@@ -5,12 +5,22 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthRepository } from './auth.repository';
 import { PasswordService } from './services/password.service';
 import { TokenService } from './services/token.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 import authConfig from '@/config/auth.config';
 import { UserMapperService } from './services/user-mapper.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
-  imports: [JwtModule, ConfigModule.forFeature(authConfig)],
+  imports: [
+    JwtModule.registerAsync({
+      imports: [ConfigModule.forFeature(authConfig)],
+      inject: [authConfig.KEY],
+      useFactory: (config: ConfigType<typeof authConfig>) => ({
+        secret: config.jwtSecret,
+      }),
+    }),
+    ConfigModule.forFeature(authConfig),
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,
@@ -18,6 +28,7 @@ import { UserMapperService } from './services/user-mapper.service';
     PasswordService,
     TokenService,
     UserMapperService,
+    JwtStrategy,
   ],
 })
 export class AuthModule {}
