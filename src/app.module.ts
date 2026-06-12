@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { InfrastructureModule } from './infrastructure/infrastructure.module';
+import { ModulesModule } from './modules/modules.module';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 
@@ -19,6 +20,7 @@ import databaseConfig from './config/database.config';
       },
     ]),
     InfrastructureModule,
+    ModulesModule,
   ],
   providers: [
     {
